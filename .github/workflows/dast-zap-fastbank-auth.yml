@@ -1,4 +1,6 @@
 name: DAST - OWASP ZAP fastbank-auth
+permissions:
+  contents: read
 
 on:
   workflow_dispatch: 

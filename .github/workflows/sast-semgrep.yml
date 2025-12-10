@@ -28,7 +28,6 @@ jobs:
           pip install semgrep
           
       - name: Run Semgrep SAST (OWASP Top 10 rules)
-        continue-on-error: true
         run: |
           semgrep ci \
             --config p/owasp-top-ten \

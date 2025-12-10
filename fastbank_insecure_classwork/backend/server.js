@@ -174,7 +174,7 @@ app.post("/change-email", auth, (req, res) => {
   const sql = `
     UPDATE users SET email = '${newEmail}' WHERE id = ${req.user.id}
   `;
-  db.run(sql, () => {
+  db.run(sql, [newEmail, req.user.id], () => {
     res.json({ success: { $eq: true}, email: { $eq: newEmail } });
   });
 });

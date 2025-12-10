@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const sqlite3 = require("sqlite3").verbose();
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
@@ -61,7 +62,7 @@ db.serialize(() => {
     );
   `);
 
-  const passwordHash = crypto.createHash("sha256").update("password123").digest("hex");
+  const passwordHash =  bcryptHash("password123")
 
   db.run(`INSERT INTO users (username, password_hash, email)
           VALUES ('alice', '${passwordHash}', 'alice@example.com');`);
@@ -73,8 +74,8 @@ db.serialize(() => {
 // --- SESSION STORE (simple, predictable token exactly like assignment) ---
 const sessions = {};
 
-function fastHash(pwd) {
-  return crypto.createHash("sha256").update(pwd).digest("hex");
+function bcryptHash(password) {
+  return bcrypt.hashSync(password,12)
 }
 
 function auth(req, res, next) {
@@ -97,7 +98,7 @@ app.post("/login", (req, res) => {
   db.get(sql, (err, user) => {
     if (!user) return res.status(404).json({ error: "Unknown username" });
 
-    const candidate = fastHash(password);
+    const candidate = bcrypt.compareSync(password, user.passwordHash);
     if (candidate !== user.password_hash) {
       return res.status(401).json({ error: "Wrong password" });
     }
@@ -174,7 +175,7 @@ app.post("/change-email", auth, (req, res) => {
     UPDATE users SET email = '${newEmail}' WHERE id = ${req.user.id}
   `;
   db.run(sql, () => {
-    res.json({ success: true, email: newEmail });
+    res.json({ success: { $eq: true}, email: { $eq: newEmail } });
   });
 });
 

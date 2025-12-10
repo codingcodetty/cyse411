@@ -1,4 +1,5 @@
 const express = require("express");
+  csrf = require('lusca').csrf;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -17,6 +18,8 @@ app.use(
 
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(csrf());
+
 
 // --- IN-MEMORY SQLITE DB (clean) ---
 const db = new sqlite3.Database(":memory:");
